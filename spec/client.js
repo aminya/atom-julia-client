@@ -18,12 +18,11 @@ module.exports = function() {
   describe("before booting", function() {
     const checkPath = p => juno.misc.paths.getVersion(p)
 
-    it("can invalidate a non-existant julia binary", () =>
-      it("", done => checkPath(path.join(__dirname, "foobar")).catch(() => done())))
+    it("can invalidate a non-existant julia binary", done => checkPath(path.join(__dirname, "foobar")).catch(() => done()))
 
-    it("can validate a julia command", () => it("", done => checkPath("julia").then(() => done())))
+    it("can validate a julia command", done => checkPath("julia").then(() => done()))
 
-    it("can invalidate a non-existant julia command", () => it("", done => checkPath("nojulia").catch(() => done())))
+    it("can invalidate a non-existant julia command", done => checkPath("nojulia").catch(() => done()))
   })
 
   let conn = null
@@ -41,18 +40,16 @@ module.exports = function() {
       conn = client.conn
     })
 
-    it("waits for the boot to complete", function() {
+    it("waits for the boot to complete", function(done) {
       const pong = client.import("ping")()
       expect(clientStatus()).toEqual([true, true])
-      it(
-        "the client to boot",
-        setTimeout(done => {
-          pong.then(function(pong) {
-            expect(pong).toBe("pong")
-            done()
-          })
-        }, 5 * 60 * 1000)
-      )
+
+      setTimeout(() => {
+        pong.then(function(pong) {
+          expect(pong).toBe("pong")
+          done()
+        })
+      }, 5 * 60 * 1000)
     })
 
     // it "recognises the client's state after boot", ->
@@ -142,8 +139,8 @@ module.exports = function() {
       })
     })
 
-    it("handles shutdown correctly", function() {
-      it("", done => evalsimple("exit()").catch(() => done()))
+    it("handles shutdown correctly", function(done) {
+      evalsimple("exit()").catch(() => done())
       expect(client.isWorking()).toBe(false)
       expect(clientStatus()).toEqual([false, false])
     })
