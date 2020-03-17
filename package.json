@@ -45,6 +45,7 @@
     "@types/semver": "^7.1.0",
     "@types/ssh2": "^0.5.41",
     "@types/underscore": "^1.9.4",
+    "atom-jasmine3-test-runner": "^4.4.3",
     "eslint": "latest",
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
@@ -52,7 +53,8 @@
     "eslint-plugin-coffee": "latest",
     "eslint-plugin-only-warn": "latest",
     "prettier": "latest",
-    "tslint": "latest"
+    "tslint": "latest",
+    "jasmine": "^3.5.0"
   },
   "scripts": {
     "postinstall": "node script/postinstall.js",
@@ -116,6 +118,7 @@
     "ink",
     "language-julia"
   ],
+  "atomTestRunner": "./spec/runner",
   "prettier": {
     "semi": false,
     "tabWidth": 2,
