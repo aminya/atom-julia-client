@@ -1,3 +1,4 @@
+/** @babel */
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -11,11 +12,11 @@ if (process.platform === 'darwin') {
   process.env.PATH += ':/usr/local/bin';
 }
 
-const basicSetup = function() {
+const basicSetup = async function() {
   jasmine.attachToDOM(atom.views.getView(atom.workspace));
-  waitsForPromise(() => atom.packages.activatePackage('language-julia'));
-  waitsForPromise(() => atom.packages.activatePackage('ink'));
-  waitsForPromise(() => atom.packages.activatePackage('julia-client'));
+  await atom.packages.activatePackage('language-julia')
+  await atom.packages.activatePackage('ink')
+  await atom.packages.activatePackage('julia-client')
   return runs(() => atom.config.set('julia-client', {
     juliaPath: 'julia',
     juliaOptions: {
@@ -30,7 +31,7 @@ const basicSetup = function() {
   ));
 };
 
-const cyclerSetup = function() {
+const cyclerSetup = async function() {
   basicSetup();
   return runs(() => atom.config.set('julia-client.juliaOptions.bootMode', 'Cycler'));
 };
