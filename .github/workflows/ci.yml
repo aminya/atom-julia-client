@@ -40,7 +40,8 @@ jobs:
         shell: bash
       - name: Run tests 👩🏾‍💻
         run: |
-          apm install ink language-julia
+          apm install ink
+          apm install language-julia
           atom --test spec
 
   Lint:
