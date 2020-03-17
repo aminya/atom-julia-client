@@ -23,7 +23,7 @@ module.exports = function() {
   })
 
   it("can evaluate code", async () => {
-    const spy = jasmine.createSpy()
+    const spy = jasmine.createSpy("test")
     client.handle({ test: spy })
     editor.insertText("Atom.@rpc test()")
     command(editor, "julia-client:run-block")
@@ -64,7 +64,7 @@ module.exports = function() {
 
     function getSuggestions() {
       const completions = require("../lib/runtime/completions")
-      completions.getSuggestions(completionsData())
+      return completions.getSuggestions(completionsData())
     }
 
     describe("basic module completions", () => {

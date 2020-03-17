@@ -71,7 +71,6 @@ module.exports = function() {
       })
 
       it("can rpc into the frontend", () => {
-        let x
         client.handle({
           test: (x) => Math.pow(x, 2)
         })
@@ -83,7 +82,7 @@ module.exports = function() {
         return Promise.all(result).then(remote => {
           const result1 = []
           for (let i = 1; i <= 10; i++) {
-            result1.push(Math.pow(x, 2))
+            result1.push(Math.pow(i, 2))
           }
           expect(remote).toEqual(result1)
         })
@@ -99,14 +98,14 @@ module.exports = function() {
       })
 
       describe("when using callbacks", () => {
-        let { cbs, workingSpy, doneSpy } = {}
+        let cbs, workingSpy, doneSpy;
 
         beforeEach(() => {
           workingSpy = jasmine.createSpy("working")
           doneSpy = jasmine.createSpy("done")
-          cbs = [1, 2, 3, 4, 5].map(() => evalsimple("peakflops(100)"))
           client.onWorking(workingSpy)
           client.onDone(doneSpy)
+          cbs = [1, 2, 3, 4, 5].map(() => evalsimple("peakflops(100)"))
         })
 
         it("enters loading state", () => {
@@ -129,7 +128,7 @@ module.exports = function() {
           })
 
           it("emits a done event", () => {
-            expect(doneSpy.calls.length).toBe(1)
+            expect(doneSpy).toHaveBeenCalledTimes(1)
           })
         })
       })
