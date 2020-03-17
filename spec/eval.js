@@ -12,75 +12,70 @@ module.exports = function() {
 
   const command = (ed, c) => atom.commands.dispatch(atom.views.getView(ed), c)
 
-  async function waitsForClient(done) {
-    client.onceDone(done)
+  async function waitsForClient() {
+    return new Promise(resolve => client.onceDone(resolve))
   }
 
-  beforeEach(async function(done) {
-    await atom.workspace.open().then(ed => (editor = ed))
+  beforeEach(async () => {
+    editor = await atom.workspace.open()
     // editor = atom.workspace.buildTextEditor()
     await editor.setGrammar(atom.grammars.grammarForScopeName("source.julia"))
-    done()
   })
 
-  it("can evaluate code", function() {
-    let spy
-    client.handle({ test: (spy = jasmine.createSpy()) })
+  it("can evaluate code", async () => {
+    const spy = jasmine.createSpy()
+    client.handle({ test: spy })
     editor.insertText("Atom.@rpc test()")
     command(editor, "julia-client:run-block")
-    waitsForClient()
+    await waitsForClient()
     expect(spy).toHaveBeenCalled()
   })
 
-  describe("when an expression is evaluated", function() {
+  describe("when an expression is evaluated", () => {
     let results = null
 
-    beforeEach(async function(done) {
+    beforeEach(async () => {
       editor.insertText("2+2")
-      await juno.runtime.evaluation.eval().then(x => {
-          (results = x)
-          done()
-        })
+      results = await juno.runtime.evaluation.eval()
     })
 
-    it("retrieves the value of the expression", function() {
+    it("retrieves the value of the expression", () => {
       expect(results.length).toBe(1)
       const view = juno.ui.views.render(results[0])
       expect(view.innerText).toBe("4")
     })
 
-    it("displays the result", function() {
+    it("displays the result", () => {
       const views = atom.views.getView(editor).querySelectorAll(".result")
       expect(views.length).toBe(1)
       expect(views[0].innerText).toBe("4")
     })
   })
 
-  describe("completions", function() {
-    const completionsData = () => ({
-      editor,
-      bufferPosition: editor.getCursors()[0].getBufferPosition(),
-      scopeDescriptor: editor.getCursors()[0].getScopeDescriptor(),
-      prefix: editor.getText()
-    })
+  describe("completions", () => {
+    function completionsData() {
+      return {
+        editor,
+        bufferPosition: editor.getCursors()[0].getBufferPosition(),
+        scopeDescriptor: editor.getCursors()[0].getScopeDescriptor(),
+        prefix: editor.getText()
+      }
+    }
 
-    const getSuggestions = function() {
+    function getSuggestions() {
       const completions = require("../lib/runtime/completions")
       completions.getSuggestions(completionsData())
     }
 
-    describe("basic module completions", function() {
+    describe("basic module completions", () => {
       let completions = null
 
-      beforeEach(async function(done) {
+      beforeEach(async () => {
         editor.insertText("sin")
-        await getSuggestions().then(cs => {
-            (completions = cs)
-            done()
-        })
+        completions = await getSuggestions()
       })
 
-      it("retrieves completions", function() {
+      it("retrieves completions", () => {
         completions = completions.map(c => c.text)
         expect(completions).toContain("sin")
         expect(completions).toContain("sincos")

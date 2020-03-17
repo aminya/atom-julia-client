@@ -38,7 +38,7 @@ async function cyclerSetup() {
 let conn = null
 
 async function withClient() {
-  beforeEach(async function() {
+  beforeEach(async () => {
     if (conn != null) {
       await client.attach(conn)
     }
@@ -48,35 +48,31 @@ async function withClient() {
 const testClient = require("./client")
 const testEval = require("./eval")
 
-describe("managing a basic client", function() {
+describe("managing a basic client", () => {
   beforeEach(basicSetup)
   testClient()
 })
 
-describe("interaction with client cycler", function() {
+describe("interaction with client cycler", () => {
   beforeEach(cyclerSetup)
   testClient()
 })
 
-describe("before use", function() {
+describe("before use", () => {
   beforeEach(basicSetup)
-  it("boots the client", function(done) {
-    setTimeout(function(done1){
-      juno.connection.boot()
-        .then(() => done1())
-    }, 5*60*1000)
+  it("boots the client", async () => {
+    await juno.connection.boot()
     conn = client.conn
-    done()
-  })
+  }, 5*60*1000)
 })
 
-describe("in an editor", function() {
+describe("in an editor", () => {
   beforeEach(basicSetup)
   withClient()
   testEval()
 })
 
-describe("after use", function() {
+describe("after use", () => {
   beforeEach(basicSetup)
   withClient()
   it("kills the client", () => client.kill())
