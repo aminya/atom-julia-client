@@ -53,7 +53,8 @@
     "eslint-plugin-coffee": "latest",
     "eslint-plugin-only-warn": "latest",
     "prettier": "latest",
-    "tslint": "latest"
+    "tslint": "latest",
+    "jasmine": "^3.5.0"
   },
   "scripts": {
     "postinstall": "node script/postinstall.js",
