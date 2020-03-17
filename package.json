@@ -45,6 +45,7 @@
     "@types/semver": "^7.1.0",
     "@types/ssh2": "^0.5.41",
     "@types/underscore": "^1.9.4",
+    "atom-jasmine3-test-runner": "^4.4.3",
     "eslint": "latest",
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
@@ -116,6 +117,7 @@
     "ink",
     "language-julia"
   ],
+  "atomTestRunner": "./spec/runner",
   "prettier": {
     "semi": false,
     "tabWidth": 2,
