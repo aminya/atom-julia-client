@@ -1,20 +1,17 @@
-'use babel'
+"use babel"
 
-import { CompositeDisposable } from 'atom'
-import { client } from '../connection'
+import { CompositeDisposable } from "atom"
+import { client } from "../connection"
 
 let subs, lintPane
 
-export function activate (ink) {
-  const linter = ink.Linter
-  ({
-    lintPane
-  } = linter)
+export function activate(ink) {
+  const linter = ink.Linter(({ lintPane } = linter))
 
   client.handle({
-    staticLint: (warnings) => {
+    staticLint: warnings => {
       lintPane.ensureVisible({
-        split: atom.config.get('julia-client.uiOptions.layouts.linter.split')
+        split: atom.config.get("julia-client.uiOptions.layouts.linter.split")
       })
       linter.setItems(warnings)
     },
@@ -23,32 +20,36 @@ export function activate (ink) {
     },
     showCompiled: (name, ...args) => {
       const cp = linter.CompiledPane.fromId(name)
-      cp.open({split: 'right'})
+      cp.open({ split: "right" })
       cp.showCode(name, ...args)
     }
   })
 
   subs = new CompositeDisposable()
 
-  subs.add(atom.commands.add('.workspace', {
-    'julia-client:clear-linter': () => linter.clearItems()
-  }))
-  subs.add(atom.config.observe('julia-client.uiOptions.layouts.linter.defaultLocation', (defaultLocation) => {
-    lintPane.setDefaultLocation(defaultLocation)
-  }))
+  subs.add(
+    atom.commands.add(".workspace", {
+      "julia-client:clear-linter": () => linter.clearItems()
+    })
+  )
+  subs.add(
+    atom.config.observe("julia-client.uiOptions.layouts.linter.defaultLocation", defaultLocation => {
+      lintPane.setDefaultLocation(defaultLocation)
+    })
+  )
 }
 
-export function open () {
+export function open() {
   return lintPane.open({
-    split: atom.config.get('julia-client.uiOptions.layouts.linter.split')
+    split: atom.config.get("julia-client.uiOptions.layouts.linter.split")
   })
 }
 
-export function close () {
+export function close() {
   return lintPane.close()
 }
 
-export function deactivate () {
+export function deactivate() {
   if (subs) {
     subs.dispose()
   }

@@ -1,28 +1,30 @@
-'use babel'
+"use babel"
 
-import {TextEditor, CompositeDisposable} from 'atom'
+import { TextEditor, CompositeDisposable } from "atom"
 
 let lastEditor
 let lastTerminal
 let subs
 
 class FocusHistory {
-	public size: any;
-	public history: any;
-	public openedItem: any;
+  public size: any
+  public history: any
+  public openedItem: any
 
-  constructor (size) {
+  constructor(size) {
     this.size = size
     this.history = []
     this.openedItem = undefined
   }
 
-  push (item) {
-    if (this.openedItem &&
-        this.openedItem.file &&
-        this.openedItem.line &&
-        item.file == this.openedItem.file &&
-        item.line == this.openedItem.line) {
+  push(item) {
+    if (
+      this.openedItem &&
+      this.openedItem.file &&
+      this.openedItem.line &&
+      item.file == this.openedItem.file &&
+      item.line == this.openedItem.line
+    ) {
       return
     }
 
@@ -33,21 +35,21 @@ class FocusHistory {
     return
   }
 
-  moveBack () {
+  moveBack() {
     const item = this.history.pop()
     if (item && item.open) {
       const activeItem = atom.workspace.getActivePaneItem()
       if (activeItem instanceof TextEditor) {
-        const file = activeItem.getPath() || 'untitled-' + activeItem.buffer.getId()
+        const file = activeItem.getPath() || "untitled-" + activeItem.buffer.getId()
         const line = activeItem.getCursorBufferPosition().row
-        this.openedItem = {file, line}
+        this.openedItem = { file, line }
       }
       item.open()
     }
   }
 }
 
-export function activate (ink) {
+export function activate(ink) {
   subs = new CompositeDisposable()
 
   subs.add(
@@ -70,25 +72,27 @@ export function activate (ink) {
   )
 
   const history = new FocusHistory(30)
-  ink.Opener.onDidOpen(({newLocation, oldLocation}) => {
+  ink.Opener.onDidOpen(({ newLocation, oldLocation }) => {
     if (oldLocation) history.push(oldLocation)
   })
 
-  subs.add(atom.commands.add('atom-workspace', {
-    'julia-client:focus-last-editor': () => focusLastEditor(),
-    'julia-client:focus-last-terminal': () => focusLastTerminal(),
-    'julia-client:return-from-goto': () => history.moveBack()
-  }))
+  subs.add(
+    atom.commands.add("atom-workspace", {
+      "julia-client:focus-last-editor": () => focusLastEditor(),
+      "julia-client:focus-last-terminal": () => focusLastTerminal(),
+      "julia-client:return-from-goto": () => history.moveBack()
+    })
+  )
 }
 
-export function deactivate () {
+export function deactivate() {
   lastEditor = null
   lastTerminal = null
   subs.dispose()
   subs = null
 }
 
-function focusLastEditor () {
+function focusLastEditor() {
   const pane = atom.workspace.paneForItem(lastEditor)
   if (pane) {
     pane.activate()
@@ -96,6 +100,6 @@ function focusLastEditor () {
   }
 }
 
-function focusLastTerminal () {
+function focusLastTerminal() {
   if (lastTerminal && lastTerminal.open) lastTerminal.open()
 }

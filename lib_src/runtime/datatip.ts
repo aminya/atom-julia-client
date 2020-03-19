@@ -8,34 +8,30 @@
  * can be helpful.
  */
 
-import { client } from '../connection'
-import modules from './modules'
-import { isValidScopeToInspect } from '../misc/scopes'
-import {
-  getWordAndRange,
-  getWordRangeWithoutTrailingDots,
-  isValidWordToInspect
-} from '../misc/words'
-import { getLocalContext } from '../misc/blocks'
+import { client } from "../connection"
+import modules from "./modules"
+import { isValidScopeToInspect } from "../misc/scopes"
+import { getWordAndRange, getWordRangeWithoutTrailingDots, isValidWordToInspect } from "../misc/words"
+import { getLocalContext } from "../misc/blocks"
 
-const datatip = client.import('datatip')
+const datatip = client.import("datatip")
 
-const grammar = atom.grammars.grammarForScopeName('source.julia')
+const grammar = atom.grammars.grammarForScopeName("source.julia")
 
 class DatatipProvider {
-	public range: any;
-	public word: any;
-	public main: any;
-	public sub: any;
-	public column: any;
-	public row: any;
-	public context: any;
-	public startRow: any;
-  providerName = 'julia-client-datatip-provider'
+  public range: any
+  public word: any
+  public main: any
+  public sub: any
+  public column: any
+  public row: any
+  public context: any
+  public startRow: any
+  providerName = "julia-client-datatip-provider"
 
   priority = 100
 
-  grammarScopes = atom.config.get('julia-client.juliaSyntaxScopes')
+  grammarScopes = atom.config.get("julia-client.juliaSyntaxScopes")
 
   useAtomIDEUI = false
 
@@ -54,10 +50,10 @@ class DatatipProvider {
     word = editor.getTextInBufferRange(range)
 
     // check the validity of code to be inspected
-    if (!(isValidWordToInspect(word))) return
+    if (!isValidWordToInspect(word)) return
 
     const { main, sub } = await modules.getEditorModule(editor, bufferPosition)
-    const mod = main ? (sub ? `${main}.${sub}` : main) : 'Main'
+    const mod = main ? (sub ? `${main}.${sub}` : main) : "Main"
 
     const { column, row } = bufferPosition
     const { context, startRow } = getLocalContext(editor, row)
@@ -78,11 +74,13 @@ class DatatipProvider {
           const value = editor.lineTextForBufferRow(result.line).trim()
           return {
             range,
-            markedStrings: [{
-              type: 'snippet',
-              value,
-              grammar
-            }]
+            markedStrings: [
+              {
+                type: "snippet",
+                value,
+                grammar
+              }
+            ]
           }
         } else if (result.strings) {
           return {
@@ -91,7 +89,7 @@ class DatatipProvider {
               return {
                 type: string.type,
                 value: string.value,
-                grammar: string.type === 'snippet' ? grammar : null
+                grammar: string.type === "snippet" ? grammar : null
               }
             })
           }
@@ -101,11 +99,13 @@ class DatatipProvider {
           const value = editor.lineTextForBufferRow(result.line).trim()
           return {
             range,
-            markedStrings: [{
-              type: 'snippet',
-              value,
-              grammar
-            }]
+            markedStrings: [
+              {
+                type: "snippet",
+                value,
+                grammar
+              }
+            ]
           }
         } else if (result.strings) {
           // @NOTE: atom-ide-datatip can't render multiple `snippet`s in `markedStrings` correctly
@@ -113,9 +113,9 @@ class DatatipProvider {
             range,
             markedStrings: result.strings.map(string => {
               return {
-                type: 'markdown',
-                value: string.type === 'snippet' ? `\`\`\`julia\n${string.value}\n\`\`\`` : string.value,
-                grammar: string.type === 'snippet' ? grammar : null
+                type: "markdown",
+                value: string.type === "snippet" ? `\`\`\`julia\n${string.value}\n\`\`\`` : string.value,
+                grammar: string.type === "snippet" ? grammar : null
               }
             })
           }

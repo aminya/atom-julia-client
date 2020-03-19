@@ -1,89 +1,112 @@
-'use babel'
+"use babel"
 
-import { CompositeDisposable } from 'atom'
-import { throttle } from 'underscore-plus'
-import { client } from '../connection'
-import modules from './modules'
+import { CompositeDisposable } from "atom"
+import { throttle } from "underscore-plus"
+import { client } from "../connection"
+import modules from "./modules"
 
-const updateeditor = client.import('updateeditor')
+const updateeditor = client.import("updateeditor")
 let pane, subs
 
-export function activate (ink) {
-  pane = ink.Outline.fromId('Julia-Outline')
+export function activate(ink) {
+  pane = ink.Outline.fromId("Julia-Outline")
   subs = new CompositeDisposable()
 
-  subs.add(atom.config.observe('julia-client.uiOptions.layouts.outline.defaultLocation', (defaultLocation) => {
-    pane.setDefaultLocation(defaultLocation)
-  }))
+  subs.add(
+    atom.config.observe("julia-client.uiOptions.layouts.outline.defaultLocation", defaultLocation => {
+      pane.setDefaultLocation(defaultLocation)
+    })
+  )
   subs.add(client.onDetached(() => pane.setItems([])))
 
   let edSubs = new CompositeDisposable()
-  subs.add(atom.workspace.onDidChangeActiveTextEditor(throttle(ed => {
-    if (!ed) return
+  subs.add(
+    atom.workspace.onDidChangeActiveTextEditor(
+      throttle(ed => {
+        if (!ed) return
 
-    edSubs.dispose()
-
-    if (ed.getGrammar().id !== 'source.julia') {
-      pane.setItems([])
-      return
-    }
-
-    edSubs = new CompositeDisposable()
-
-    edSubs.add(ed.onDidDestroy(() => {
-      edSubs.dispose()
-      pane.setItems([])
-    }))
-    edSubs.add(ed.onDidChangeGrammar((grammar) => {
-      if (grammar.id !== 'source.julia') {
         edSubs.dispose()
-        pane.setItems([])
-      }
-    }))
 
-    let outline = []
+        if (ed.getGrammar().id !== "source.julia") {
+          pane.setItems([])
+          return
+        }
 
-    edSubs.add(ed.onDidStopChanging(() => {
-      updateEditor(ed).then(outlineItems => {
-        outline = handleOutline(ed, edSubs, outlineItems)
-      }).catch(err => {
-        console.log(err);
-      })
-    }))
+        edSubs = new CompositeDisposable()
 
-    edSubs.add(ed.onDidChangeCursorPosition(throttle(() => {
-      const cursorLine = ed.getCursorBufferPosition().row + 1
+        edSubs.add(
+          ed.onDidDestroy(() => {
+            edSubs.dispose()
+            pane.setItems([])
+          })
+        )
+        edSubs.add(
+          ed.onDidChangeGrammar(grammar => {
+            if (grammar.id !== "source.julia") {
+              edSubs.dispose()
+              pane.setItems([])
+            }
+          })
+        )
 
-      outline = outline.map(item => {
-        item.isActive = item.start <= cursorLine && cursorLine <= item.stop
-        return item
-      })
+        let outline = []
 
-      pane.setItems(outline)
-    }, 300)))
+        edSubs.add(
+          ed.onDidStopChanging(() => {
+            updateEditor(ed)
+              .then(outlineItems => {
+                outline = handleOutline(ed, edSubs, outlineItems)
+              })
+              .catch(err => {
+                console.log(err)
+              })
+          })
+        )
 
-    updateEditor(ed, {
-      updateSymbols: false
-    }).then(outlineItems => {
-      outline = handleOutline(ed, edSubs, outlineItems)
-    }).catch(err => {
-      console.log(err);
-    })
-  }, 300)))
+        edSubs.add(
+          ed.onDidChangeCursorPosition(
+            throttle(() => {
+              const cursorLine = ed.getCursorBufferPosition().row + 1
+
+              outline = outline.map(item => {
+                item.isActive = item.start <= cursorLine && cursorLine <= item.stop
+                return item
+              })
+
+              pane.setItems(outline)
+            }, 300)
+          )
+        )
+
+        updateEditor(ed, {
+          updateSymbols: false
+        })
+          .then(outlineItems => {
+            outline = handleOutline(ed, edSubs, outlineItems)
+          })
+          .catch(err => {
+            console.log(err)
+          })
+      }, 300)
+    )
+  )
 }
 
 // NOTE: update outline and symbols cache all in one go
-function updateEditor (editor, options = {
-  updateSymbols: true
-}) {
+function updateEditor(
+  editor,
+  options = {
+    updateSymbols: true
+  }
+) {
   if (!client.isActive()) {
-    return new Promise((resolve) => resolve([]))
+    return new Promise(resolve => resolve([]))
   }
 
   const text = editor.getText()
   const currentModule = modules.current()
-  const mod = currentModule ? currentModule : 'Main'
-  const path = editor.getPath() || 'untitled-' + editor.getBuffer().getId()
+  const mod = currentModule ? currentModule : "Main"
+  const path = editor.getPath() || "untitled-" + editor.getBuffer().getId()
   return updateeditor({
     text,
     mod,
@@ -93,7 +116,7 @@ function updateEditor (editor, options = {
   })
 }
 
-function handleOutline (ed, subs, items) {
+function handleOutline(ed, subs, items) {
   const cursorLine = ed.getCursorBufferPosition().row + 1
 
   items = items.map(item => {
@@ -116,16 +139,16 @@ function handleOutline (ed, subs, items) {
   return items
 }
 
-export function open () {
+export function open() {
   return pane.open({
-    split: atom.config.get('julia-client.uiOptions.layouts.outline.split')
+    split: atom.config.get("julia-client.uiOptions.layouts.outline.split")
   })
 }
 
-export function close () {
+export function close() {
   return pane.close()
 }
 
-export function deactivate () {
+export function deactivate() {
   subs.dispose()
 }
