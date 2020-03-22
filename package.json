@@ -52,7 +52,8 @@
     "eslint-plugin-coffee": "latest",
     "eslint-plugin-only-warn": "latest",
     "prettier": "latest",
-    "tslint": "latest"
+    "tslint": "latest",
+    "tslint-config-prettier": "latest"
   },
   "scripts": {
     "postinstall": "node script/postinstall.js",
