@@ -19,7 +19,7 @@
     "incremental": true,
     // "inlineSourceMap": false,
     // "preserveConstEnums": true,
-    "sourceMap": true,
+    // "sourceMap": true,
     "preserveSymlinks": true,
     // "removeComments": true,
     // "jsx": "react",
