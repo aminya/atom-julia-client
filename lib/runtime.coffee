@@ -37,11 +37,8 @@ module.exports =
 
   consumeInk: (ink) ->
     @evaluation.ink = ink
-    for mod in [@console, @debugger, @profiler, @linter, @goto, @outline, @frontend]
+    for mod in [@console, @debugger, @profiler, @linter, @goto, @outline, @frontend, @workspace, @plots]
       mod.activate(ink)
-    for mod in [@workspace, @plots]
-      mod.ink = ink
-      mod.activate()
     @subs.add new Disposable =>
       mod.deactivate() for mod in [@console, @debugger, @profiler, @linter, @goto, @outline]
     @environments.consumeInk(ink)
